@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматная доска</title>
+    <link rel="stylesheet" href="/static/css/board.css">
+</head>
+<body>
+    <div class="chessboard">
+        {% for row in board %}
+        {% set outer_loop = loop %}
+        <div class="row">
+            {% for cell in row %}
+            <div class="cell {% if (loop.index0 + outer_loop.index0) % 2 == 0 %}white{% else %}black{% endif %}">
+                {% if cell %}
+                <span class="piece">
+                    {% if cell == 'K' %}&#9812;{% elif cell == 'Q' %}&#9813;{% elif cell == 'R' %}&#9814;
+                    {% elif cell == 'B' %}&#9815;{% elif cell == 'N' %}&#9816;{% elif cell == 'P' %}&#9817;
+                    {% elif cell == 'k' %}&#9818;{% elif cell == 'q' %}&#9819;{% elif cell == 'r' %}&#9820;
+                    {% elif cell == 'b' %}&#9821;{% elif cell == 'n' %}&#9822;{% elif cell == 'p' %}&#9823;
+                    {% endif %}
+                </span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

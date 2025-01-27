@@ -26,3 +26,7 @@ class Board:
         if fig == ".":
             return False
         return True
+
+    def rotated_configuration(self):
+        rotated_conf = [rot[::-1] for rot in list(zip(*self.configuration[::-1]))]
+        return rotated_conf

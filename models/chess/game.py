@@ -1,5 +1,4 @@
 from .board import Board
-from . import figure
 from .move import Move
 
 class Game:
