@@ -27,6 +27,10 @@ class Board:
             return False
         return True
 
+    def straight_configuration(self):
+        conf = list(zip(*self.configuration))
+        return conf
+
     def rotated_configuration(self):
-        rotated_conf = [rot[::-1] for rot in list(zip(*self.configuration[::-1]))]
+        rotated_conf = [rot[::-1] for rot in list(zip(*self.configuration))][::-1]
         return rotated_conf

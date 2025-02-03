@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Многопользовательская игра</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>Добро пожаловать в игру!</h1>
+    <div id="messages"></div>
+    <script>
+        const socket = io();
+
+        // Подключение к серверу
+        socket.on('connect', () => {
+            console.log('Подключен к серверу');
+            socket.emit('join', { username: 'Игрок' });
+        });
+
+        // Получение сообщений от сервера
+        socket.on('message', (data) => {
+            const messages = document.getElementById('messages');
+            messages.innerHTML += `<p>${data}</p>`;
+        });
+
+        // Уведомление о новом пользователе
+        socket.on('user_joined', (data) => {
+            const messages = document.getElementById('messages');
+            messages.innerHTML += `<p>${data.username} присоединился к игре!</p>`;
+        });
+    </script>
+</body>
+</html>

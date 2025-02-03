@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Шахматы в реальном времени</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>Шахматы в реальном времени</h1>
+    Правила игры:
+    <ol>
+        <li>Любой игрок может перемещать любую доступную фигуру в любой момент времени.</li>
+        <li>Одновременно можно перемещать только одну фигуру.</li>
+        <li>После того как фигура перемещена, определенная задержка не позволяет ей двигаться снова в течение короткого периода времени.</li>
+        <li>скорость движения фигур не мгновенна.</li>
+        <li>В игре не существует шахов и взятий на проходе, так как игроки не ограничены одним ходом за раз и поэтому могут отвечать на угрозы несколькими движениями фигур.</li>
+        <li>Игра заканчивалась только тогда, когда король был физически захвачен или когда противник сдался.</li>
+    </ol>
+    <button id="find-game-button">Найти игру</button>
+    <script>
+        const playerId = "{{ session.player_id }}";
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Подключен к серверу');
+            socket.emit('join', { player_id: playerId });
+        });
+
+        document.getElementById('find-game-button').addEventListener('click', () => {
+            socket.emit('find_game', { player_id: playerId });
+        });
+
+        socket.on('game_created', (data) => {
+            window.location.href = `/game/${data.game_id}`;
+        });
+    </script>
+</body>
+</html>
