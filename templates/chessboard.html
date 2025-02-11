@@ -6,36 +6,54 @@
     <title>Шахматная доска</title>
     <link rel="stylesheet" href="/static/css/board.css">
     <script>
-        // Функция для обработки клика по клетке
         function handleClick(row, col) {
-        // Отправляем запрос на сервер для получения доступных ходов
-        fetch(`/moves?row=${row}&col=${col}`)
-            .then(response => response.json())
-            .then(data => handleData(data))
-            .catch(error => console.error('Error fetching moves:', error));
+            // Отправляем запрос на сервер для получения доступных ходов
+            fetch(`/moves?row=${row}&col=${col}`)
+                .then(response => response.json())
+                .then(data => {
+                    handleData(data, row, col);
+                })
+                .catch(error => console.error('Error fetching moves:', error));
         }
-        
-        // Выделение доступных ходов на доске
-        function handleData(data) {
-        // Сбрасываем выделение
-        document.querySelectorAll('.cell').forEach(cell => {
-            cell.classList.remove('highlight');
-        });
-        
+
+    function handleData(data, row, col) {
+        document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('highlight'));
+
         if ("moves" in data) {
-            moves = data['moves'];
-            // Выделяем доступные клетки
-            moves.forEach(([row, col]) => {
-                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            data['moves'].forEach(([r, c]) => {
+                const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
                 if (cell) {
                     cell.classList.add('highlight');
                 }
             });
-        }
-        else if ("board" in data) {
+        } else if ("board" in data) {
             renderBoard(data['board']);
+
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            if (!cell) return;
+
+            // Создаем контейнер для индикатора
+            const indicator = document.createElement("div");
+            indicator.classList.add("loading-indicator");
+
+            // Создаем SVG-кольцо
+            indicator.innerHTML = `
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45"></circle>
+                </svg>
+            `;
+
+            // Размещаем индикатор в клетке
+            cell.style.position = "relative"; // Делаем клетку относительным контейнером
+            cell.appendChild(indicator);
+
+            // Удаляем ТОЛЬКО этот индикатор через 5 секунд
+            setTimeout(() => {
+                indicator.remove();
+            }, 5000);
         }
     }
+
     
     const pieceSymbols = {
         "K": "&#9812;", "Q": "&#9813;", "R": "&#9814;", "B": "&#9815;", "N": "&#9816;", "P": "&#9817;",

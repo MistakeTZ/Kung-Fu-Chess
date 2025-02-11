@@ -47,3 +47,43 @@ body {
     box-shadow: inset 0 0 10px 5px rgba(0, 255, 0, 0.5);
     position: relative;
 }
+
+@keyframes progress {
+    0% {
+        stroke-dasharray: 283;
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dasharray: 283;
+        stroke-dashoffset: -283; /* Уходит против часовой стрелки */
+    }
+}
+
+.loading-indicator {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Не мешает кликам */
+}
+
+.loading-indicator svg {
+    width: 100%;
+    height: 100%;
+}
+
+.loading-indicator circle {
+    fill: none;
+    stroke: rgba(0, 255, 0, 0.8);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 0;
+    transform: rotate(90deg); /* Поворот, чтобы убывало против часовой */
+    transform-origin: 50% 50%;
+    animation: progress 5s linear forwards;
+}

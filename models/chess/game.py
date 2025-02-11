@@ -1,10 +1,11 @@
 from .board import Board
 from .move import Move
 from enum import Enum
+from datetime import datetime
 
 class Game:
     board: Board
-    moves: list
+    moves: list = []
     first_player: str
     second_player: str
     positions = [{"fig": None, "possible_moves": []}] * 2
@@ -26,7 +27,7 @@ class Game:
 
             self.positions[player]["fig"] = None
             if [col, row] in possible_moves:
-                self.move(Move(fig, [col, row]))
+                self.move(Move(fig, [col, row]), player)
                 if player:
                     return {"board": self.board.straight_configuration()}
                 else:
@@ -34,17 +35,36 @@ class Game:
             else:
                 return self.send_configuration(player, row, col)
         else:
-            possible_moves = get_possible_moves(self.board.configuration, player, col, row)
-            self.positions[player]["fig"] = [col, row]
+            is_on_time = self.check_time(row, col)
+            if is_on_time:
+                possible_moves = get_possible_moves(self.board.configuration, player, col, row)
+                self.positions[player]["fig"] = [col, row]
+            else:
+                possible_moves = []
+                self.positions[player]["fig"] = None
+
             self.positions[player]["possible_moves"] = possible_moves
             return {"moves": possible_moves}
 
-    def move(self, move: Move):
+    def check_time(self, row, col):
+        move_to_point = next((x for x in self.moves if x["move"].to_square.x == col and x["move"].to_square.y == row), None)
+        if not move_to_point:
+            return True
+        delta = datetime.now() - move_to_point["time"]
+        return delta.total_seconds() > 5
+
+    def move(self, move: Move, player):
         if isinstance(move, str):
             move = Move.from_string(move)
 
         if not self.board.is_legal_move(move):
             raise Exception("Illegal move")
+
+        self.moves.append({
+            "move": move,
+            "player": player,
+            "time": datetime.now()
+        })
 
         self.board.configuration[move.to_square.y][
             move.to_square.x] = self.board.configuration[move.from_square.y][move.from_square.x]
