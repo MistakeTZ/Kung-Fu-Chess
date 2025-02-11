@@ -8,20 +8,22 @@
     <script>
         // Функция для обработки клика по клетке
         function handleClick(row, col) {
-            // Отправляем запрос на сервер для получения доступных ходов
-            fetch(`/moves?row=${row}&col=${col}`)
-                .then(response => response.json())
-                .then(data => highlightMoves(data))
-                .catch(error => console.error('Error fetching moves:', error));
+        // Отправляем запрос на сервер для получения доступных ходов
+        fetch(`/moves?row=${row}&col=${col}`)
+            .then(response => response.json())
+            .then(data => handleData(data))
+            .catch(error => console.error('Error fetching moves:', error));
         }
-
+        
         // Выделение доступных ходов на доске
-        function highlightMoves(moves) {
-            // Сбрасываем выделение
-            document.querySelectorAll('.cell').forEach(cell => {
-                cell.classList.remove('highlight');
-            });
-
+        function handleData(data) {
+        // Сбрасываем выделение
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.classList.remove('highlight');
+        });
+        
+        if ("moves" in data) {
+            moves = data['moves'];
             // Выделяем доступные клетки
             moves.forEach(([row, col]) => {
                 const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
@@ -30,30 +32,55 @@
                 }
             });
         }
+        else if ("board" in data) {
+            renderBoard(data['board']);
+        }
+    }
+    
+    const pieceSymbols = {
+        "K": "&#9812;", "Q": "&#9813;", "R": "&#9814;", "B": "&#9815;", "N": "&#9816;", "P": "&#9817;",
+        "k": "&#9818;", "q": "&#9819;", "r": "&#9820;", "b": "&#9821;", "n": "&#9822;", "p": "&#9823;"
+    };
+    
+    function renderBoard(board) {
+        const boardElement = document.getElementById("chessboard");
+        boardElement.innerHTML = "";
+        
+        board.forEach((row, rowIndex) => {
+            const rowDiv = document.createElement("div");
+            rowDiv.classList.add("row");
+            
+            row.forEach((cell, colIndex) => {
+                const cellDiv = document.createElement("div");
+                cellDiv.classList.add("cell", (rowIndex + colIndex) % 2 === 0 ? "white" : "black");
+                cellDiv.dataset.row = rowIndex;
+                cellDiv.dataset.col = colIndex;
+                cellDiv.onclick = () => handleClick(rowIndex, colIndex);
+                
+                if (cell) {
+                    const pieceSpan = document.createElement("span");
+                    pieceSpan.classList.add("piece");
+                    pieceSpan.innerHTML = pieceSymbols[cell] || "";
+                    cellDiv.appendChild(pieceSpan);
+                }
+                
+                rowDiv.appendChild(cellDiv);
+            });
+            
+            boardElement.appendChild(rowDiv);
+        });
+    }
+
+    onload = () => {
+        var board = JSON.parse('{{ board | tojson }}');
+        renderBoard(board);
+    }
     </script>
 </head>
+
 <body>
-    <div class="chessboard">
-        {% for row in board %}
-        {% set outer_loop = loop %}
-        <div class="row">
-            {% for cell in row %}
-            <div class="cell {% if (loop.index0 + outer_loop.index0) % 2 == 0 %}white{% else %}black{% endif %}"
-                data-row="{{ outer_loop.index0 }}" data-col="{{ loop.index0 }}"
-                onclick="handleClick({{ outer_loop.index0 }}, {{ loop.index0}})">
-                {% if cell %}
-                <span class="piece">
-                    {% if cell == 'K' %}&#9812;{% elif cell == 'Q' %}&#9813;{% elif cell == 'R' %}&#9814;
-                    {% elif cell == 'B' %}&#9815;{% elif cell == 'N' %}&#9816;{% elif cell == 'P' %}&#9817;
-                    {% elif cell == 'k' %}&#9818;{% elif cell == 'q' %}&#9819;{% elif cell == 'r' %}&#9820;
-                    {% elif cell == 'b' %}&#9821;{% elif cell == 'n' %}&#9822;{% elif cell == 'p' %}&#9823;
-                    {% endif %}
-                </span>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-        {% endfor %}
+    <div id="chessboard">
+
     </div>
 </body>
 </html>

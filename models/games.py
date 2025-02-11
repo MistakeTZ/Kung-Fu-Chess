@@ -25,6 +25,6 @@ def create_game(player1, player2):
     game_id = str(uuid.uuid4())
     games[game_id] = {
         'players': [player1, player2],
-        'game': Game()
+        'game': Game(first_player=player1, second_player=player2)
     }
     return game_id

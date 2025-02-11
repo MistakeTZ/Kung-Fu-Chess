@@ -1,7 +1,7 @@
 from models.chess.game import Game
+from models.chess.move import Move
 from flask import render_template, request, jsonify, Blueprint, session
 from models.games import games
-from models.chess.game_logic import get_possible_moves
 import uuid
 
 
@@ -31,15 +31,12 @@ def game_page(game_id):
 def get_moves():
     row = int(request.args.get('row'))
     col = int(request.args.get('col'))
-    print(row, col)
 
-    if session["game_id"] in games:
-        game = games[session["game_id"]]["game"]
-        player = games[session["game_id"]]["players"].index(
-            session["player_id"])
-        possible_moves = get_possible_moves(game, player, col, row)
+    if not session["game_id"] in games:
+        return jsonify({"moves": []})
+    
+    game = games[session["game_id"]]["game"]
+    player = games[session["game_id"]]["players"].index(
+        session["player_id"])
 
-    else:
-        possible_moves = []
-
-    return jsonify(possible_moves)
+    return jsonify(game.send_configuration(player, col, row))
