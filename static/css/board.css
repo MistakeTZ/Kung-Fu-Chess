@@ -86,7 +86,6 @@ body {
 
 .loading-indicator circle {
     fill: none;
-    stroke: rgba(0, 255, 0, 0.8);
     stroke-width: 6;
     stroke-linecap: round;
     stroke-dasharray: 283;

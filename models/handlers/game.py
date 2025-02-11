@@ -1,6 +1,7 @@
 from models.chess.game import Game
 from models.chess.move import Move
 from flask import render_template, request, jsonify, Blueprint, session
+from flask_socketio import emit
 from models.games import games
 import uuid
 
@@ -39,4 +40,16 @@ def get_moves():
     player = games[session["game_id"]]["players"].index(
         session["player_id"])
 
-    return jsonify(game.send_configuration(player, col, row))
+    configurations = game.send_configuration(player, col, row)
+    return jsonify(configurations)
+    # print(configurations)
+    # if "moves" in configurations:
+    #     return jsonify(configurations)
+    # else:
+    #     conf = {
+    #         "row": row,
+    #         "col": col,
+    #         "board": game.board.straight_configuration() if player else game.board.rotated_configuration()
+    #     }
+    #     emit('move', conf, room=games[session["game_id"]]["players"][not player], broadcast=True)
+    #     return jsonify(configurations)
