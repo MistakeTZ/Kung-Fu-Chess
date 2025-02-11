@@ -19,27 +19,24 @@ class Game:
 
     def send_configuration(self, player, row, col):
         position = self.positions[player]
-        print(position)
         fig = position["fig"]
 
         if fig:
             possible_moves = position["possible_moves"]
 
             self.positions[player]["fig"] = None
-            print(possible_moves, [row, col], [row, col] in possible_moves)
-            if [row, col] in possible_moves:
-                self.move(Move(*fig, [row, col]))
+            if [col, row] in possible_moves:
+                self.move(Move(fig, [col, row]))
                 if player:
-                    return {"board": self.board.rotated_configuration()}
-                else:
                     return {"board": self.board.straight_configuration()}
+                else:
+                    return {"board": self.board.rotated_configuration()}
             else:
                 return self.send_configuration(player, row, col)
         else:
             possible_moves = get_possible_moves(self.board.configuration, player, col, row)
-            self.positions[player]["fig"] = [row, col]
+            self.positions[player]["fig"] = [col, row]
             self.positions[player]["possible_moves"] = possible_moves
-            print(self.positions[player])
             return {"moves": possible_moves}
 
     def move(self, move: Move):
