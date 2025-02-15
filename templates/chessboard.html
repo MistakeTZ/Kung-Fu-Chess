@@ -8,6 +8,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
     const socket = io();
+    const playerId = "{{ session.player_id }}";
+
+    socket.on('connect', () => {
+        console.log('Подключен к игре');
+        socket.emit('join', { player_id: playerId });
+    });
+
     // Ход противника
     socket.on('move', (data) => {
         console.log(data);

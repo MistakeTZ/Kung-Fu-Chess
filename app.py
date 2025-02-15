@@ -6,7 +6,8 @@ app.secret_key = "my_secret_key"
 socketio = SocketIO(app)
 
 if __name__ == '__main__':
-    from models.handlers.game import simple_page
+    from models.handlers.game import register_handlers
+    simple_page = register_handlers(socketio)
 
     # Подклчение обработчиков
     app.register_blueprint(simple_page)
