@@ -38,6 +38,8 @@ class Game:
             is_on_time = self.check_time(row, col)
             if is_on_time:
                 possible_moves = get_possible_moves(self.board.configuration, player, col, row)
+                if not player:
+                    possible_moves = [[7 - x, 7 - y] for x, y in possible_moves]
                 self.positions[player]["fig"] = [col, row]
             else:
                 possible_moves = []
@@ -56,6 +58,12 @@ class Game:
     def move(self, move: Move, player):
         if isinstance(move, str):
             move = Move.from_string(move)
+
+        if not player:
+            move.from_square.x = 7 - move.from_square.x
+            move.to_square.x = 7 - move.to_square.x
+            move.from_square.y = 7 - move.from_square.y
+            move.to_square.y = 7 - move.to_square.y
 
         if not self.board.is_legal_move(move):
             raise Exception("Illegal move")
@@ -77,10 +85,14 @@ class Point(Enum):
     FREE = 2
 
 def get_possible_moves(board: list, player, row, col):
-    if player:
-        fig = board[col][row]
-    else:
-        fig = board[7 - col][7 - row]
+    if not player:
+        col = 7 - col
+        row = 7 - row
+
+    fig = board[col][row]
+    mod = [-1, 1][player]
+    print(fig, mod, row, col)
+    
     if fig == ".":
         return []
     if fig.isupper() != player:
@@ -89,15 +101,15 @@ def get_possible_moves(board: list, player, row, col):
     possible_moves = []
     match(fig.lower()):
         case "p":
-            if can_go(board, player, row, col - 1) == Point.FREE:
-                possible_moves.append([row, col - 1])
-                if col == 6:
-                    if can_go(board, player, row, col - 2) == Point.FREE:
-                        possible_moves.append([row, col - 2])
-            if can_go(board, player, row - 1, col - 1) == Point.ENEMY:
-                possible_moves.append([row - 1, col - 1])
-            if can_go(board, player, row + 1, col - 1) == Point.ENEMY:
-                possible_moves.append([row + 1, col - 1])
+            if can_go(board, player, row, col - mod) == Point.FREE:
+                possible_moves.append([row, col - mod])
+                if (col == 6 and player) or (col == 1 and not player):
+                    if can_go(board, player, row, col - 2 * mod) == Point.FREE:
+                        possible_moves.append([row, col - 2 * mod])
+            if can_go(board, player, row - 1, col - mod) == Point.ENEMY:
+                possible_moves.append([row - 1, col - mod])
+            if can_go(board, player, row + 1, col - mod) == Point.ENEMY:
+                possible_moves.append([row + 1, col - mod])
         case "k":
             for i in range(-1, 2):
                 for j in range(-1, 2):
@@ -163,6 +175,7 @@ def get_possible_moves(board: list, player, row, col):
     return possible_moves
 
 def can_go(board, case, row, col):
+    print(row, col)
     if 0 <= row < 8 and 0 <= col < 8:
         figure = board[col][row]
         if figure == ".":

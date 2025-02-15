@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Шахматная доска</title>
     <link rel="stylesheet" href="/static/css/board.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
+    const socket = io();
+    // Ход противника
+    socket.on('move', (data) => {
+        console.log(data);
+        create_cell(data['row'], data['col'], 255, 0, 0, 0.8);
+        renderBoard(data['board']);
+    });
+
     function handleClick(row, col) {
         // Отправляем запрос на сервер для получения доступных ходов
         fetch(`/moves?row=${row}&col=${col}`)
@@ -107,13 +116,6 @@
         var board = JSON.parse('{{ board | tojson }}');
         renderBoard(board);
     }
-
-    const socket = io();
-        // Ход противника
-        socket.on('move', (data) => {
-            create_cell(data['row'], data['col'], 255, 0, 0, 0.8);
-            renderBoard(data['board']);
-        });
     </script>
 </head>
 

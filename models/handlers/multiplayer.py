@@ -23,3 +23,5 @@ def register_multiplayer_handlers(socketio):
             # Отправляем игрокам информацию о созданной игре
             emit('game_created', {'game_id': game_id}, room=player1, broadcast=True)
             emit('game_created', {'game_id': game_id}, room=player2, broadcast=True)
+
+            emit("move", {}, broadcast=True)

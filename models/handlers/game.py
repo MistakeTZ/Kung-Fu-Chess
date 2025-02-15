@@ -1,8 +1,8 @@
 from models.chess.game import Game
 from models.chess.move import Move
 from flask import render_template, request, jsonify, Blueprint, session
-from flask_socketio import emit
 from models.games import games
+from app import socketio
 import uuid
 
 
@@ -35,21 +35,22 @@ def get_moves():
 
     if not session["game_id"] in games:
         return jsonify({"moves": []})
-    
-    game = games[session["game_id"]]["game"]
-    player = games[session["game_id"]]["players"].index(
+
+    game_dict = games[session["game_id"]]
+    game = game_dict["game"]
+    player = game_dict["players"].index(
         session["player_id"])
 
     configurations = game.send_configuration(player, col, row)
-    return jsonify(configurations)
-    # print(configurations)
-    # if "moves" in configurations:
-    #     return jsonify(configurations)
-    # else:
-    #     conf = {
-    #         "row": row,
-    #         "col": col,
-    #         "board": game.board.straight_configuration() if player else game.board.rotated_configuration()
-    #     }
-    #     emit('move', conf, room=games[session["game_id"]]["players"][not player], broadcast=True)
-    #     return jsonify(configurations)
+    # return jsonify(configurations)
+    print(configurations)
+    if "moves" in configurations:
+        return jsonify(configurations)
+    else:
+        conf = {
+            "row": row,
+            "col": col,
+            "board": game.board.straight_configuration() if player else game.board.rotated_configuration()
+        }
+        socketio.emit('move', conf, room=game_dict["players"][not player], namespace="/game/*")
+        return jsonify(configurations)
