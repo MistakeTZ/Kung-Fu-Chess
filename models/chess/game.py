@@ -26,8 +26,18 @@ class Game:
             possible_moves = position["possible_moves"]
 
             self.positions[player]["fig"] = None
+
+            
             if [col, row] in possible_moves:
-                self.move(Move(fig, [col, row]), player)
+                last_line = row == 0
+
+                fig = self.move(Move(fig, [col, row]), player)
+                print(fig)
+                if fig.lower() == "k":
+                    print("Game ended")
+                if last_line and fig.lower() == "p":
+                    self.board.configuration[row][col] = "Q"
+                    
                 if player:
                     return {"board": self.board.straight_configuration()}
                 else:
@@ -59,6 +69,8 @@ class Game:
         if isinstance(move, str):
             move = Move.from_string(move)
 
+        last_line = move.to_square.y == 0
+
         if not player:
             move.from_square.x = 7 - move.from_square.x
             move.to_square.x = 7 - move.to_square.x
@@ -74,9 +86,16 @@ class Game:
             "time": datetime.now()
         })
 
-        self.board.configuration[move.to_square.y][
-            move.to_square.x] = self.board.configuration[move.from_square.y][move.from_square.x]
+        fig = self.board.configuration[move.from_square.y][move.from_square.x]
+        to_fig = self.board.configuration[move.to_square.y][move.to_square.x]
+
+        if fig.lower() == "p" and last_line:
+            self.board.configuration[move.to_square.y][move.to_square.x] = fig.isupper() and "Q" or "q"
+        else:
+            self.board.configuration[move.to_square.y][
+                move.to_square.x] = self.board.configuration[move.from_square.y][move.from_square.x]
         self.board.configuration[move.from_square.y][move.from_square.x] = '.'
+        return to_fig
 
 class Point(Enum):
     NOT = -1

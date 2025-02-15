@@ -27,6 +27,7 @@ def register_handlers(socketio: SocketIO):
                 return render_template('chessboard.html', board=game['game'].board.straight_configuration())
         return render_template('404.html'), 404
 
+
     @simple_page.route('/moves')
     def get_moves():
         row = int(request.args.get('row'))
