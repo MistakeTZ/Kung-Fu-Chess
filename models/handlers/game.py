@@ -50,9 +50,15 @@ def register_handlers(socketio: SocketIO):
             conf = {
                 "row": 7 - row,
                 "col": 7 - col,
-                "board": game.board.rotated_configuration() if player else game.board.straight_configuration()
+                "board": game.board.rotated_configuration() if player else game.board.straight_configuration(),
+                "lose": configurations["end_game"]
             }
             socketio.emit('move', conf, room=game_dict["players"][not player])
+            if configurations["end_game"]:
+                end_game(game_id)
             return jsonify(configurations)
 
     return simple_page
+
+def end_game(game_id):
+    del games[game_id]

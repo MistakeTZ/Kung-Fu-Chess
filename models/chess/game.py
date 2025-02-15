@@ -26,22 +26,18 @@ class Game:
             possible_moves = position["possible_moves"]
 
             self.positions[player]["fig"] = None
-
             
             if [col, row] in possible_moves:
-                last_line = row == 0
-
                 fig = self.move(Move(fig, [col, row]), player)
-                print(fig)
                 if fig.lower() == "k":
-                    print("Game ended")
-                if last_line and fig.lower() == "p":
-                    self.board.configuration[row][col] = "Q"
+                    end_game = True
+                else:
+                    end_game = False
                     
                 if player:
-                    return {"board": self.board.straight_configuration()}
+                    return {"board": self.board.straight_configuration(), "end_game": end_game}
                 else:
-                    return {"board": self.board.rotated_configuration()}
+                    return {"board": self.board.rotated_configuration(), "end_game": end_game}
             else:
                 return self.send_configuration(player, row, col)
         else:
@@ -110,7 +106,6 @@ def get_possible_moves(board: list, player, row, col):
 
     fig = board[col][row]
     mod = [-1, 1][player]
-    print(fig, mod, row, col)
     
     if fig == ".":
         return []
@@ -194,7 +189,6 @@ def get_possible_moves(board: list, player, row, col):
     return possible_moves
 
 def can_go(board, case, row, col):
-    print(row, col)
     if 0 <= row < 8 and 0 <= col < 8:
         figure = board[col][row]
         if figure == ".":

@@ -9,20 +9,35 @@
     <script>
     const socket = io();
     const playerId = "{{ session.player_id }}";
+    let end_game = false;
 
     socket.on('connect', () => {
         console.log('Подключен к игре');
         socket.emit('join', { player_id: playerId });
     });
 
-    // Ход противника
+    function showEndgameMessage(message) {
+        const endgameMessage = document.getElementById("endgame-message");
+        document.getElementById("endgame-text").innerText = message;
+        endgameMessage.style.display = "block";
+    }
+
+    function restartGame() {
+        window.location.href = '/'; 
+    }
+
     socket.on('move', (data) => {
-        console.log(data);
         create_cell(data['row'], data['col'], 255, 0, 0, 0.8);
         renderBoard(data['board']);
+        if (data['lose']) {
+            end_game = true;
+            showEndgameMessage("Вы проиграли!"); 
+        }
     });
 
     function handleClick(row, col) {
+        if (end_game) return;
+
         // Отправляем запрос на сервер для получения доступных ходов
         fetch(`/moves?row=${row}&col=${col}`)
             .then(response => response.json())
@@ -44,8 +59,12 @@
             });
         } else if ("board" in data) {
             renderBoard(data['board']);
-
             create_cell(row, col, 0, 255, 0, 0.8);
+        }
+
+        if (data['end_game']) {
+            end_game = true;
+            showEndgameMessage("Вы победили!");
         }
     }
 
@@ -132,5 +151,9 @@
         <div id="indicators-container"></div>
     </div>
     
+    <div id="endgame-message" class="hidden">
+        <p id="endgame-text"></p>
+        <button onclick="restartGame()">Вернуться на доску</button>
+    </div>    
 </body>
 </html>

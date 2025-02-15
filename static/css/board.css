@@ -94,3 +94,24 @@ body {
     transform-origin: 50% 50%;
     animation: progress 5s linear forwards;
 }
+
+#endgame-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+}
+
+#endgame-message button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    background: white;
+    cursor: pointer;
+}
