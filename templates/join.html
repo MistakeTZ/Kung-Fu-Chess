@@ -48,6 +48,9 @@
         button:hover {
             background-color: #45a049;
         }
+        .searching {
+            background-color: #007BFF !important;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +79,10 @@
         });
 
         document.getElementById('find-game-button').addEventListener('click', () => {
+            const button = document.getElementById('find-game-button');
+            button.textContent = "Поиск игры";
+            button.classList.add("searching");
+            button.disabled = true;
             socket.emit('find_game', { player_id: playerId });
         });
 
